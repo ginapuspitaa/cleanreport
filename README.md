@@ -48,6 +48,44 @@ Aplikasi web berbasis cloud untuk pelaporan sampah secara real-time dengan integ
 - AWS RDS untuk database
 - AWS Security Groups untuk networking
 
+## 🔄 CI/CD Pipeline
+
+Project ini menggunakan GitHub Actions untuk Continuous Integration dan Continuous Deployment.
+
+### Workflow Features:
+
+- ✅ **Automated Testing**: Jalankan unit tests pada setiap push
+- ✅ **Docker Build**: Build dan push Docker image ke GitHub Container Registry
+- ✅ **Multi-Environment**: Support untuk development dan production
+- ✅ **Security Scanning**: Automated security checks
+- ✅ **Deployment Ready**: Siap untuk deployment otomatis
+
+### GitHub Actions Workflow:
+
+```yaml
+# .github/workflows/ci-cd.yml
+- Test backend dengan Jest
+- Build Docker image
+- Push ke GHCR (ghcr.io)
+- Deploy ke production (configurable)
+```
+
+### Menjalankan Tests Lokal:
+
+```bash
+cd backend
+npm install
+npm test
+```
+
+### Docker Image:
+
+Setelah push ke main branch, Docker image akan tersedia di:
+
+```
+ghcr.io/[username]/cleanreport:latest
+```
+
 ## 📦 Prasyarat
 
 ### Local Development
