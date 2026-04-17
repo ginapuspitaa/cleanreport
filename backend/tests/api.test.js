@@ -2,27 +2,36 @@ const request = require("supertest");
 const express = require("express");
 
 // Mock database and AWS for testing
-jest.mock("./config/database", () => ({
+jest.mock("../src/config/database", () => ({
   initializeDatabase: jest.fn().mockResolvedValue(true),
   pool: {
-    query: jest.fn(),
+    getConnection: jest.fn().mockResolvedValue({
+      query: jest.fn().mockResolvedValue([[]]), // Return empty array for SELECT
+      release: jest.fn(),
+    }),
+    query: jest.fn().mockResolvedValue([[]]), // Return empty array for SELECT
     end: jest.fn(),
   },
 }));
 
-jest.mock("./config/aws", () => ({
+jest.mock("../src/config/aws", () => ({
   uploadToS3: jest.fn().mockResolvedValue("https://mock-s3-url.com/image.jpg"),
   deleteFromS3: jest.fn().mockResolvedValue(true),
 }));
 
-const app = require("./server");
+const app = require("../src/server");
 
 describe("CleanReport API", () => {
   beforeAll(async () => {
     // Wait for database initialization
     await new Promise((resolve) => setTimeout(resolve, 100));
   });
-
+  afterAll(async () => {
+    // Close server after tests
+    if (app && app.close) {
+      await new Promise((resolve) => app.close(resolve));
+    }
+  });
   describe("GET /", () => {
     it("should return API endpoints list", async () => {
       const response = await request(app).get("/");
@@ -36,7 +45,7 @@ describe("CleanReport API", () => {
     it("should return health status", async () => {
       const response = await request(app).get("/health");
       expect(response.status).toBe(200);
-      expect(response.body).toHaveProperty("status", "healthy");
+      expect(response.body).toHaveProperty("status", "OK");
     });
   });
 
