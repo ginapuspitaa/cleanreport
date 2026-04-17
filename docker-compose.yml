@@ -1,0 +1,75 @@
+# CleanReport - Docker Compose Configuration
+version: "3.8"
+
+services:
+  # Backend API Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: cleanreport-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres_password
+      - DB_NAME=cleanreport
+      - DB_DIALECT=postgres
+      - AWS_REGION=ap-southeast-1
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_S3_BUCKET=${AWS_S3_BUCKET}
+      - AWS_S3_REGION=ap-southeast-1
+    depends_on:
+      - postgres
+    networks:
+      - cleanreport-network
+    restart: unless-stopped
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+
+  # PostgreSQL Database Service
+  postgres:
+    image: postgres:15-alpine
+    container_name: cleanreport-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres_password
+      POSTGRES_DB: cleanreport
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - cleanreport-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Frontend Service (Optional - for serving static files)
+  # frontend:
+  #   image: nginx:alpine
+  #   container_name: cleanreport-frontend
+  #   ports:
+  #     - "80:80"
+  #   volumes:
+  #     - ./frontend:/usr/share/nginx/html:ro
+  #   networks:
+  #     - cleanreport-network
+  #   restart: unless-stopped
+
+networks:
+  cleanreport-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
