@@ -1,0 +1,28 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cleanreport-config
+  namespace: cleanreport
+data:
+  NODE_ENV: "production"
+  PORT: "3000"
+  DB_DIALECT: "postgres"
+  DB_HOST: "cleanreport-postgres"
+  DB_PORT: "5432"
+  DB_NAME: "cleanreport_prod"
+  AWS_REGION: "us-east-1"
+  AWS_S3_REGION: "us-east-1"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cleanreport-secrets
+  namespace: cleanreport
+type: Opaque
+data:
+  # Base64 encoded values - replace with your actual secrets
+  DB_USER: eW91cl9kYl91c2Vy # your_db_user
+  DB_PASSWORD: eW91cl9zZWN1cmVfZGF0YWJhc2VfcGFzc3dvcmQ= # your_secure_database_password
+  AWS_ACCESS_KEY_ID: eW91cl9hd3NfYWNjZXNzX2tleQ== # your_aws_access_key
+  AWS_SECRET_ACCESS_KEY: eW91cl9hd3Nfc2VjcmV0X2tleQ== # your_aws_secret_key
+  AWS_S3_BUCKET: eW91ci1jbGVhbnJlcG9ydC1idWNrZXQ= # your-cleanreport-bucket
